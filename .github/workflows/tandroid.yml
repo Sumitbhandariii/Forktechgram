@@ -1,4 +1,4 @@
-Name: Fork ClienT
+name: Fork ClienT
 
 on: [push]
 
@@ -115,14 +115,14 @@ jobs:
           tempVer=${tempVer::-2}
           echo "NEW_OFFICIAL_TAG_TEXT=$tempVer" >> $GITHUB_ENV
       - name: Attest build provenance
-        if: true
+        if: ${{ contains(github.event.head_commit.message, '[Release]') }}
         uses: actions/attest-build-provenance@v2
         with:
           subject-path: 'artifact/*.apk'
 
       - uses: actions/upload-artifact@master
         name: Upload artifact
-        if: true
+        if: ${{ contains(github.event.head_commit.message, '[Release]') }}
         with:
           name: ForkClient-${{ matrix.type }}
           path: artifact/
