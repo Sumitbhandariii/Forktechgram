@@ -115,14 +115,14 @@ jobs:
           tempVer=${tempVer::-2}
           echo "NEW_OFFICIAL_TAG_TEXT=$tempVer" >> $GITHUB_ENV
       - name: Attest build provenance
-        if: ${{ contains(github.event.head_commit.message, '[Release]') }}
+        if: true
         uses: actions/attest-build-provenance@v2
         with:
           subject-path: 'artifact/*.apk'
 
       - uses: actions/upload-artifact@master
         name: Upload artifact
-        if: ${{ contains(github.event.head_commit.message, '[Release]') }}
+        if: true
         with:
           name: ForkClient-${{ matrix.type }}
           path: artifact/
