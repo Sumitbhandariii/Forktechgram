@@ -50,7 +50,7 @@ android {
     compileSdkVersion 35
     buildToolsVersion '35.0.0'
 
-    defaultConfig.applicationId = "org.forkclient.messenger"
+    defaultConfig.applicationId = "org.novagram.messenger"
 
     sourceSets.main.jniLibs.srcDirs = ['../TMessagesProj/jni/']
 
@@ -71,7 +71,7 @@ android {
     def appSuffix = fdroid ? "" : ".beta"
     def flavorsConfig = fdroid ? "release" : "debug"
     if (fdroid) {
-        defaultConfig.applicationId = "org.forkgram.messenger"
+        defaultConfig.applicationId = "org.novagram.messenger"
     }
 
     signingConfigs {
@@ -262,7 +262,7 @@ android {
             ndk {
                 abiFilters "arm64-v8a"
             }
-            applicationId "org.forkclient.messenger.test"
+            applicationId "org.novagram.messenger.test"
             sourceSets.debug {
                 manifest.srcFile '../TMessagesProj/config/debug/AndroidManifest_SDK23.xml'
             }

@@ -13385,7 +13385,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 case VIEW_TYPE_HEADER:
                     HeaderCell headerCell = (HeaderCell) holder.itemView;
                     if (position == forkHeaderRow) {
-                        headerCell.setText("Fork");
+                        headerCell.setText("Nova Power");
                     }
                     if (position == infoHeaderRow) {
                         if (ChatObject.isChannel(currentChat) && !currentChat.megagroup && channelInfoRow != -1) {
