@@ -1525,6 +1525,7 @@ public class LocaleController {
         }
         if ("Page1Title". equals(key)) {
             return "Novagram";
+        }
         return getInstance().getStringInternal(key, res);
     }
 
