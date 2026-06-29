@@ -1523,8 +1523,11 @@ public class LocaleController {
         if ("AppName".equals(key)) {
             return "Novagram";
         }
-        if ("Page1Title". equals(key)) {
+        if ("Page1Title".equals(key)) {
             return "Novagram";
+        }
+        if ("TelegramVersion".equals(key)) {
+            return "Novagram based on Telegram for Android %1$s";
         }
         return getInstance().getStringInternal(key, res);
     }
