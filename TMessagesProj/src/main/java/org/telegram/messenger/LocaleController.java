@@ -1520,6 +1520,9 @@ public class LocaleController {
     // deprecated: String key is no longer necessary
     @Deprecated
     public static String getString(String key, @StringRes int res) {
+        if ("AppName".equals(key)) {
+            return "Novagram";
+        }
         return getInstance().getStringInternal(key, res);
     }
 
