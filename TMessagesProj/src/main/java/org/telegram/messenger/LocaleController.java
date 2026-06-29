@@ -1523,6 +1523,8 @@ public class LocaleController {
         if ("AppName".equals(key)) {
             return "Novagram";
         }
+        if ("Page1Title". equals(key)) {
+            return "Novagram";
         return getInstance().getStringInternal(key, res);
     }
 
