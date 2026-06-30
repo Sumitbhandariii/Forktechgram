@@ -1520,6 +1520,15 @@ public class LocaleController {
     // deprecated: String key is no longer necessary
     @Deprecated
     public static String getString(String key, @StringRes int res) {
+        if ("AppName".equals(key)) {
+            return "Novagram";
+        }
+        if ("Page1Title".equals(key)) {
+            return "Novagram";
+        }
+        if ("TelegramVersion".equals(key)) {
+            return "Novagram based on Telegram for Android %1$s";
+        }
         return getInstance().getStringInternal(key, res);
     }
 
