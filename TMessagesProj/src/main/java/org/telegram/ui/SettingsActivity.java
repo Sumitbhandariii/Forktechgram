@@ -848,7 +848,7 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
                 presentFragment(new ForkSettingsActivity());
                 break;
             case 99:
-                ((LaunchActivity) getParentActivity()).checkAppUpdate(true, null);
+                Browser.openUrl(getParentActivity(), "https://t.me/novagram_updates");
                 break;
 
             case 17:
