@@ -1529,6 +1529,12 @@ public class LocaleController {
         if ("TelegramVersion".equals(key)) {
             return "Novagram based on Telegram for Android %1$s";
         }
+        if ("PermissionXiaomiLockscreen".equals(key)) {
+            return "Please allow Novagram to be shown on the lock screen so that calls can work properly.";
+        }
+        if ("PermissionFSILockscreen".equals(key)) {
+            return "Please allow Novagram to be shown on the lock screen so that calls can work properly.";
+        }
         return getInstance().getStringInternal(key, res);
     }
 
@@ -1720,6 +1726,9 @@ public class LocaleController {
     }
 
     public static String formatString(String key, String fallback, int res, int fallbackRes, Object... args) {
+        if ("TelegramVersion".equals(key)) {
+            return String.format("Novagram based on Telegram for Android %1$s", args[0]);
+        }
         try {
             String value = BuildVars.USE_CLOUD_STRINGS ? getInstance().localeValues.get(key) : null;
             if (value == null) {
