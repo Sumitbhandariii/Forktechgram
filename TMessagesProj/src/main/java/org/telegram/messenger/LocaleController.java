@@ -1519,23 +1519,37 @@ public class LocaleController {
 
     // deprecated: String key is no longer necessary
     @Deprecated
+    private static final java.util.Set<String> KEEP_KEYS = new java.util.HashSet<>(java.util.Arrays.asList(
+        "AuthAnotherClientInfo2", "TelegramPassportCreatePasswordInfo",
+        "QRLoginSubtitle", "QRLoginStep1", "SessionsListInfo",
+        "TelegramVersion"
+    ));
+
+    private static String rebrand(String key, String value) {
+        if (value == null || key == null) return value;
+        if (KEEP_KEYS.contains(key)) return value;
+        if (!value.contains("elegram")) return value;
+        StringBuilder sb = new StringBuilder();
+        java.util.regex.Matcher m = java.util.regex.Pattern.compile("https?://[^\\s\"'<>]+").matcher(value);
+        java.util.List<String> urls = new java.util.ArrayList<>();
+        int last = 0;
+        while (m.find()) {
+            sb.append(value, last, m.start()).append("@@U").append(urls.size()).append("@@");
+            urls.add(m.group());
+            last = m.end();
+        }
+        sb.append(value.substring(last));
+        String out = sb.toString()
+            .replace("Telegram", "Novagram")
+            .replace("telegram", "novagram")
+            .replace("TELEGRAM", "NOVAGRAM");
+        for (int i = 0; i < urls.size(); i++)
+            out = out.replace("@@U" + i + "@@", urls.get(i));
+        return out;
+    }
+
     public static String getString(String key, @StringRes int res) {
-        if ("AppName".equals(key)) {
-            return "Novagram";
-        }
-        if ("Page1Title".equals(key)) {
-            return "Novagram";
-        }
-        if ("TelegramVersion".equals(key)) {
-            return "Novagram based on Telegram for Android %1$s";
-        }
-        if ("PermissionXiaomiLockscreen".equals(key)) {
-            return "Please allow Novagram to be shown on the lock screen so that calls can work properly.";
-        }
-        if ("PermissionFSILockscreen".equals(key)) {
-            return "Please allow Novagram to be shown on the lock screen so that calls can work properly.";
-        }
-        return getInstance().getStringInternal(key, res);
+        return rebrand(key, getInstance().getStringInternal(key, res));
     }
 
     // deprecated: String key is no longer necessary
@@ -1755,9 +1769,9 @@ public class LocaleController {
             }
 
             if (getInstance().currentLocale != null) {
-                return String.format(getInstance().currentLocale, value, args);
+                return rebrand(key, String.format(getInstance().currentLocale, value, args));
             } else {
-                return String.format(value, args);
+                return rebrand(key, String.format(value, args));
             }
         } catch (Exception e) {
             FileLog.e(e);
