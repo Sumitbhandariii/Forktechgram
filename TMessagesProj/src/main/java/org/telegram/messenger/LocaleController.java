@@ -1522,8 +1522,12 @@ public class LocaleController {
     private static final java.util.Set<String> KEEP_KEYS = new java.util.HashSet<>(java.util.Arrays.asList(
         "AuthAnotherClientInfo2", "TelegramPassportCreatePasswordInfo",
         "QRLoginSubtitle", "QRLoginStep1", "SessionsListInfo",
-        "TelegramVersion"
+        "TelegramVersion",
+        "TelegramFaq"
     ));
+    private static final String[] PROTECTED_PHRASES = {
+        "Telegram Premium", "Telegram Stars", "Telegram Business", "Telegram Terms of Service"
+    };
 
     private static String rebrand(String key, String value) {
         if (value == null || key == null) return value;
@@ -1539,10 +1543,17 @@ public class LocaleController {
             last = m.end();
         }
         sb.append(value.substring(last));
-        String out = sb.toString()
+        String temp = sb.toString();
+        for (int i = 0; i < PROTECTED_PHRASES.length; i++) {
+            temp = temp.replace(PROTECTED_PHRASES[i], "@@P" + i + "@@");
+        }
+        String out = temp
             .replace("Telegram", "Novagram")
             .replace("telegram", "novagram")
             .replace("TELEGRAM", "NOVAGRAM");
+        for (int i = 0; i < PROTECTED_PHRASES.length; i++) {
+            out = out.replace("@@P" + i + "@@", PROTECTED_PHRASES[i]);
+        }
         for (int i = 0; i < urls.size(); i++)
             out = out.replace("@@U" + i + "@@", urls.get(i));
         return out;
