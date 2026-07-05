@@ -337,6 +337,7 @@ public class DialogStoriesCell extends FrameLayout implements NotificationCenter
         telegramLogoView.setText("Novagram");
         telegramLogoView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 15);
         telegramLogoView.setTextColor(getTextLogoColor());
+        telegramLogoView.setTypeface(AndroidUtilities.bold());
         telegramLogoView.setImportantForAccessibility(View.IMPORTANT_FOR_ACCESSIBILITY_YES);
         telegramLogoView.setFocusableInTouchMode(true);
         addView(telegramLogoView, LayoutHelper.createFrame(90, 22));

@@ -1530,6 +1530,7 @@ public class LocaleController {
     };
 
     private static String rebrand(String key, String value) {
+        if ("TelegramFaq".equals(key)) return "Telegram FAQ";
         if (value == null || key == null) return value;
         if (KEEP_KEYS.contains(key)) return value;
         if (!value.contains("elegram")) return value;
