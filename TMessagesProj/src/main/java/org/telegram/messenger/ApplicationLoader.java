@@ -436,6 +436,24 @@ public class ApplicationLoader extends Application {
                 }
                 return;
             }
+            boolean googlePlayAvailable = false;
+            try {
+                googlePlayAvailable = com.google.android.gms.common.GoogleApiAvailability.getInstance()
+                    .isGooglePlayServicesAvailable(applicationContext) ==com.google.android.gms.common.ConnectionResult.SUCCESS;
+            } catch (Throwable ignore) {
+            }
+            if (googlePlayAvailable) {
+                Log.d("Fork Client", "Google Play Services available, skipping push service watchdog");
+                try {
+                    applicationContext.stopService(new Intent(applicationContext, NotificationsService.class));
+                    AlarmManager alarm = (AlarmManager) applicationContext.getSystemService(Context.ALARM_SERVICE);
+                    if (pendingIntent != null) {
+                        alarm.cancel(pendingIntent);
+                    }
+                } catch (Throwable ignore) {
+                }
+                return;
+            }
             Log.d("TFOSS", "Trying to start push service every minute");
             // Telegram-FOSS: unconditionally enable push service
             AlarmManager am = (AlarmManager) applicationContext.getSystemService(Context.ALARM_SERVICE);
