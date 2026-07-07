@@ -31,6 +31,7 @@ import android.os.PowerManager;
 import android.os.SystemClock;
 import android.telephony.TelephonyManager;
 import android.view.ViewGroup;
+import com.google.android.gms.ads.MobileAds;
 
 import android.text.TextUtils;
 import android.util.Log;
@@ -324,6 +325,9 @@ public class ApplicationLoader extends Application {
         }
 
         super.onCreate();
+        new Thread(() -> {
+            mobileAds.initialize(this, initializationStatus -> {});
+        }).start();
 
         if (BuildVars.LOGS_ENABLED) {
             FileLog.d("app start time = " + (startTime = SystemClock.elapsedRealtime()));
