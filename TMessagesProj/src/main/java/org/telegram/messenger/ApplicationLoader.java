@@ -326,7 +326,7 @@ public class ApplicationLoader extends Application {
 
         super.onCreate();
         new Thread(() -> {
-            mobileAds.initialize(this, initializationStatus -> {});
+            MobileAds.initialize(this, initializationStatus -> {});
         }).start();
 
         if (BuildVars.LOGS_ENABLED) {
