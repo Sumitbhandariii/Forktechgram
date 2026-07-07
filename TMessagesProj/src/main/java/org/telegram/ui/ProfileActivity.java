@@ -632,6 +632,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
     private int questionRow;
     private int faqRow;
     private int policyRow;
+    private int adRow;
     private int helpSectionCell;
     private int debugHeaderRow;
     private int sendLogsRow;
@@ -10425,6 +10426,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         questionRow = -1;
         faqRow = -1;
         policyRow = -1;
+        adRow = -1;
         helpSectionCell = -1;
         debugHeaderRow = -1;
         sendLogsRow = -1;
@@ -10626,6 +10628,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 questionRow = rowCount++;
                 faqRow = rowCount++;
                 policyRow = rowCount++;
+                adrow = rowCount++;
                 if (BuildVars.LOGS_ENABLED || BuildVars.DEBUG_PRIVATE_VERSION) {
                     helpSectionCell = rowCount++;
                     // debugHeaderRow = rowCount++;
@@ -13072,7 +13075,8 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                 VIEW_TYPE_MUSIC = 29,
                 VIEW_TYPE_TEXT_DETAIL_MULTILINE_2 = 30,
                 VIEW_TYPE_EMPTY2 = 31,
-                VIEW_TYPE_TEXT2 = 32;
+                VIEW_TYPE_TEXT2 = 32,
+                VIEW_TYPE_AD = 33;
 
         private Context mContext;
 
@@ -13104,6 +13108,16 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     final TextView textView = new TextView2(mContext);
                     view = textView;
                     break;
+                case VIEW_TYPE_AD: {
+                    FrameLayout adContainer = new FrameLayout(mContext);
+                    com.google.android.gms.ads.AdView adView = new com.google.android.gms.ads.AdView(mContext);
+                    adView.setAdSize(com.google.android.gms.ads.AdSize.BANNER);
+                    adView.setAdUnitId("ca-app-pub-3940256099942544/6300978111");
+                    adContainer.addView(adView);
+                    adView.loadAd(new com.google.android.gms.ads.AdRequest.Builder().build());
+                    view = adContainer;
+                    break;
+                }
                 case VIEW_TYPE_ABOUT_LINK: {
                     view = aboutLinkCell = new AboutLinkCell(mContext, ProfileActivity.this, resourcesProvider) {
                         @Override
@@ -13382,6 +13396,8 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
         @Override
         public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
             switch (holder.getItemViewType()) {
+                case VIEW_TYPE_AD:
+                    break;
                 case VIEW_TYPE_HEADER:
                     HeaderCell headerCell = (HeaderCell) holder.itemView;
                     if (position == forkHeaderRow) {
@@ -14272,6 +14288,9 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
 
         @Override
         public int getItemViewType(int position) {
+            if (position == adRow) {
+                return VIEW_TYPE_AD;
+            }
             if (position == forkSectionCell) {
                 return 7;
             } else if (position == forkHeaderRow) {
