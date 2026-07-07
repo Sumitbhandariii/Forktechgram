@@ -325,10 +325,11 @@ public class ApplicationLoader extends Application {
         }
 
         super.onCreate();
-        new Thread(() -> {
-            MobileAds.initialize(this, initializationStatus -> {});
-        }).start();
-
+        try {
+            com.google.android.gms.ads.MobileAds.initialize(this, initializationStatus -> {
+            });
+        } catch (Throwable ignore) {
+        }
         if (BuildVars.LOGS_ENABLED) {
             FileLog.d("app start time = " + (startTime = SystemClock.elapsedRealtime()));
             try {
