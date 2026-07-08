@@ -13110,10 +13110,13 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     break;
                 case VIEW_TYPE_AD: {
                     FrameLayout adContainer = new FrameLayout(mContext);
+                    adContainer.setPadding(dp(16), dp(12), dp(16), dp(12));
+                    adContainer.setBackgroundColor(getThemedColor(Theme.key_windowBackgroundWhite));
                     com.google.android.gms.ads.AdView adView = new com.google.android.gms.ads.AdView(mContext);
                     adView.setAdSize(com.google.android.gms.ads.AdSize.BANNER);
                     adView.setAdUnitId("ca-app-pub-3940256099942544/6300978111");
-                    adContainer.addView(adView);
+                    FrameLayout.LayoutParams adLayoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER);
+                    adContainer.addView(adView, adLayoutParams);
                     adView.loadAd(new com.google.android.gms.ads.AdRequest.Builder().build());
                     view = adContainer;
                     break;
@@ -15685,6 +15688,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
             put(++pointer, questionRow, sparseIntArray);
             put(++pointer, faqRow, sparseIntArray);
             put(++pointer, policyRow, sparseIntArray);
+            put(++pointer, adRow, sparseIntArray);
             put(++pointer, helpSectionCell, sparseIntArray);
             put(++pointer, debugHeaderRow, sparseIntArray);
             put(++pointer, sendLogsRow, sparseIntArray);
