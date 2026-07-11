@@ -172,6 +172,8 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
     private TLRPC.FileLocation avatar;
     private TLRPC.FileLocation avatarBig;
     private ImageLocation uploadingImageLocation;
+    private com.google.android.gms.ads.interstitial.InterstitialAd interstitialAd;
+    private boolean subSettingOpened = false;
 
     private FrameLayout topView;
     private FrameLayout avatarContainer;
@@ -752,6 +754,7 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
     }
 
     private void presentSettingFragment(BaseFragment fragment) {
+        subSettingOpened = true;
         if (AndroidUtilities.isTablet() && LaunchActivity.instance != null && LaunchActivity.instance.getRightActionBarLayout() != null) {
             final INavigationLayout layout = LaunchActivity.instance.getRightActionBarLayout();
             if (!layout.getFragmentStack().isEmpty()) {
@@ -885,6 +888,35 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
                 }
                 break;
             }
+        }
+    }
+
+    private void loadInterstitialAd() {
+        com.google.android.gms.ads.interstitial.InterstitialAd.load(
+            getParentActivity(),
+            "ca-app-pub-3940256099942544/1033173712",
+            new com.google.android.gms.ads.AdRequest.Builder().build(),
+            new com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback() {
+                @Override
+                public void onAdLoaded(@androidx.annotation.NonNull com.google.android.gms.ads.interstitial.InterstitialAd ad) {
+                    interstitialAd = ad;
+                }
+            }
+        );
+    }
+    
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (subSettingOpened) {
+            subSettingOpened = false;
+            if (interstitialAd != null) {
+                interstitialAd.show(getParentActivity());
+                interstitialAd = null;
+            }
+        }
+        if (interstitialAd == null) {
+            loadInterstitialAd();
         }
     }
 
