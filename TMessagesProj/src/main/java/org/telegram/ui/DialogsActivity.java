@@ -1600,69 +1600,36 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         if (prefs.getBoolean("foldersSeeded", false)) {
             return;
         }
-        if (getMessagesController().suggestedFilters == null || getMessagesController().suggestedFilters.isEmpty()) {
-            return;
-        }
         prefs.edit().putBoolean("foldersSeeded", true).apply();
 
-        ArrayList<String> wanted = new ArrayList<>();
-        wanted.add("Unread");
-        wanted.add("Groups");
-        wanted.add("Channels");
-        wanted.add("Bots");
+        int allTypes = MessagesController.DIALOG_FILTER_FLAG_CONTACTS
+            | MessagesController.DIALOG_FILTER_FLAG_NON_CONTACTS
+            | MessagesController.DIALOG_FILTER_FLAG_GROUPS
+            | MessagesController.DIALOG_FILTER_FLAG_CHANNELS
+            | MessagesController.DIALOG_FILTER_FLAG_BOTS;
 
-        for (TLRPC.TL_dialogFilterSuggested suggested : new ArrayList<>(getMessagesController().suggestedFilters)) {
-            String desc = suggested.description;
-            boolean matches = false;
-            for (String w : wanted) {
-                if (desc != null && desc.toLowerCase().contains(w.toLowerCase())) {
-                    matches = true;
-                    break;
-                }
-            }
-            if (!matches) continue;
+        createDefaultFolder("Unread", allTypes | MessagesController.DIALOG_FILTER_FLAG_EXCLUDE_READ);
+        createDefaultFolder("Groups", MessagesController.DIALOG_FILTER_FLAG_GROUPS);
+        createDefaultFolder("Channels", MessagesController.DIALOG_FILTER_FLAG_CHANNELS);
+        createDefaultFolder("Bots", MessagesController.DIALOG_FILTER_FLAG_BOTS);
+    }
 
-            MessagesController.DialogFilter filter = new MessagesController.DialogFilter();
-            filter.name = suggested.filter.title.text;
-            filter.entities = suggested.filter.title.entities;
-            filter.id = 2;
-            while (getMessagesController().dialogFiltersById.get(filter.id) != null) {
-                filter.id++;
-            }
-            filter.order = getMessagesController().getDialogFilters().size();
-            filter.pendingUnreadCount = filter.unreadCount = -1;
-
-            for (int b = 0; b < 2; b++) {
-                ArrayList<TLRPC.InputPeer> fromArray = b == 0 ? suggested.filter.include_peers : suggested.filter.exclude_peers;
-                ArrayList<Long> toArray = b == 0 ? filter.alwaysShow : filter.neverShow;
-                for (int a = 0, N = fromArray.size(); a < N; a++) {
-                    TLRPC.InputPeer peer = fromArray.get(a);
-                    long lowerId;
-                    if (peer.user_id != 0) {
-                        lowerId = peer.user_id;
-                    } else if (peer.chat_id != 0) {
-                        lowerId = -peer.chat_id;
-                    } else {
-                        lowerId = -peer.channel_id;
-                    }
-                    toArray.add(lowerId);
-                }
-            }
-
-            if (suggested.filter.groups) filter.flags |= MessagesController.DIALOG_FILTER_FLAG_GROUPS;
-            if (suggested.filter.bots) filter.flags |= MessagesController.DIALOG_FILTER_FLAG_BOTS;
-            if (suggested.filter.contacts) filter.flags |= MessagesController.DIALOG_FILTER_FLAG_CONTACTS;
-            if (suggested.filter.non_contacts) filter.flags |= MessagesController.DIALOG_FILTER_FLAG_NON_CONTACTS;
-            if (suggested.filter.broadcasts) filter.flags |= MessagesController.DIALOG_FILTER_FLAG_CHANNELS;
-            if (suggested.filter.exclude_archived) filter.flags |= MessagesController.DIALOG_FILTER_FLAG_EXCLUDE_ARCHIVED;
-            if (suggested.filter.exclude_read) filter.flags |= MessagesController.DIALOG_FILTER_FLAG_EXCLUDE_READ;
-            if (suggested.filter.exclude_muted) filter.flags |= MessagesController.DIALOG_FILTER_FLAG_EXCLUDE_MUTED;
-
-            FilterCreateActivity.saveFilterToServer(filter, filter.flags, filter.name, filter.entities, filter.title_noanimate, filter.color, filter.alwaysShow, filter.neverShow, filter.pinnedDialogs, true, true, true, true, false, this, () -> {
-                getMessagesController().suggestedFilters.remove(suggested);
-                getNotificationCenter().postNotificationName(NotificationCenter.dialogFiltersUpdated);
-            });
+    private void createDefaultFolder(String name, int flags) {
+        MessagesController.DialogFilter filter = new MessagesController.DialogFilter();
+        filter.name = name;
+        filter.entities = new ArrayList<>();
+        filter.id = 2;
+        while (getMessagesController().dialogFiltersById.get(filter.id) != null) {
+            filter.id++;
         }
+        filter.order = getMessagesController().getDialogFilters().size();
+        filter.pendingUnreadCount = filter.unreadCount = -1;
+        filter.alwaysShow = new ArrayList<>();
+        filter.neverShow = new ArrayList<>();
+        filter.pinnedDialogs = new LongSparseIntArray();
+        filter.flags = flags;
+        filter.color = -1;
+        FilterCreateActivity.saveFilterToServer(filter, filter.flags, filter.name, filter.entities, false, filter.color, filter.alwaysShow, filter.neverShow, filter.pinnedDialogs, true, true, true, true, false, this, null);
     }
 
     private void updateStoriesViewAlpha(float alpha) {
@@ -3006,6 +2973,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         }
 
         BirthdayController.getInstance(currentAccount).check();
+        autoSeedDefaultFolders();
         additionNavigationBarHeight = hasMainTabs ? dp(MAIN_TABS_HEIGHT_WITH_MARGINS) : 0;
         additionFloatingButtonOffset = hasMainTabs ? dp(DialogsActivity.MAIN_TABS_HEIGHT + DialogsActivity.MAIN_TABS_MARGIN) : 0;
 
