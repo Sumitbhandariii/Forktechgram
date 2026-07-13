@@ -2937,8 +2937,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 .add(NotificationCenter.dialogFiltersUpdated)
                 .add(NotificationCenter.suggestedFiltersLoaded);
             getMessagesController().loadSuggestedFilters();
-            observersGroup
-                .add(NotificationCenter.updateInterfaces)
+            observersGroup.add(NotificationCenter.updateInterfaces)
                 .add(NotificationCenter.encryptedChatUpdated)
                 .add(NotificationCenter.contactsDidLoad)
                 .add(NotificationCenter.appDidLogout)
