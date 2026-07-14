@@ -81,8 +81,7 @@ import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
-import androidx.collection.LongSparseIntArray;
-
+import org.telegram.messenger.support.LongSparseIntArray;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
