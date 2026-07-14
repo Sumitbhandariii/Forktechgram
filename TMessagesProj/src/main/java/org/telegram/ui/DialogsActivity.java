@@ -1603,6 +1603,11 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         }
         prefs.edit().putBoolean("foldersSeeded", true).apply();
 
+        if (getParentActivity() == null) {
+            return;
+        }
+        android.widget.Toast.makeText(getParentActivity(), "Seeding started", android.widget.Toast.LENGTH_LONG).show();
+
         int allTypes = MessagesController.DIALOG_FILTER_FLAG_CONTACTS
             | MessagesController.DIALOG_FILTER_FLAG_NON_CONTACTS
             | MessagesController.DIALOG_FILTER_FLAG_GROUPS
@@ -1627,10 +1632,13 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         filter.pendingUnreadCount = filter.unreadCount = -1;
         filter.alwaysShow = new ArrayList<>();
         filter.neverShow = new ArrayList<>();
-        filter.pinnedDialogs = new LongSparseIntArray();
+        filter.pinnedDialogs = new org.telegram.messenger.support.LongSparseIntArray();
         filter.flags = flags;
         filter.color = -1;
-        FilterCreateActivity.saveFilterToServer(filter, filter.flags, filter.name, filter.entities, false, filter.color, filter.alwaysShow, filter.neverShow, filter.pinnedDialogs, true, true, true, true, false, this, null);
+
+        FilterCreateActivity.saveFilterToServer(filter, filter.flags, filter.name, filter.entities, false, filter.color, filter.alwaysShow, filter.neverShow, filter.pinnedDialogs, true, true, true, true, false, this, () -> {
+            android.widget.Toast.makeText(getParentActivity(), "Created: " + name, android.widget.Toast.LENGTH_LONG).show();
+        });
     }
 
     private void updateStoriesViewAlpha(float alpha) {
