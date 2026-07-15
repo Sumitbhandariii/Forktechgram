@@ -211,7 +211,7 @@ public class SessionCell extends FrameLayout {
 
             StringBuilder stringBuilder = new StringBuilder();
             if (session.device_model.length() != 0) {
-                stringBuilder.append("Novagram");
+                stringBuilder.append(session.device_model);
             }
             if (stringBuilder.length() == 0) {
                 if (session.platform.length() != 0) {
@@ -248,7 +248,7 @@ public class SessionCell extends FrameLayout {
             detailExTextView.setText(spannableStringBuilder);
 
             stringBuilder = new StringBuilder();
-            stringBuilder.append(session.app_name);
+            stringBuilder.append("Novagram Android");
             stringBuilder.append(" ").append(session.app_version);
 
             detailTextView.setText(stringBuilder);
