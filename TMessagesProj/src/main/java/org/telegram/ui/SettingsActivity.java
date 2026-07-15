@@ -886,7 +886,7 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
                 if (MessagesController.getInstance(currentAccount).isFrozen()) {
                     AccountFrozenAlert.show(currentAccount);
                 } else {
-                    Browser.openUrl(getContext(), "t.me/novagram_updates");
+                    Browser.openUrl(getContext(), "https://t.me/novagram_updates");
                 }
                 break;
             }
