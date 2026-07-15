@@ -1597,15 +1597,15 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     }
 
     private void autoSeedDefaultFolders() {
+        if (getParentActivity() == null) {
+            return;
+        }
         SharedPreferences prefs = MessagesController.getMainSettings(currentAccount);
         if (prefs.getBoolean("foldersSeeded", false)) {
             return;
         }
         prefs.edit().putBoolean("foldersSeeded", true).apply();
-
-        if (getParentActivity() == null) {
-            return;
-        }
+        
         android.widget.Toast.makeText(getParentActivity(), "Seeding started", android.widget.Toast.LENGTH_LONG).show();
 
         int allTypes = MessagesController.DIALOG_FILTER_FLAG_CONTACTS
@@ -2911,9 +2911,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             observersGroup
                 .add(NotificationCenter.dialogsNeedReload)
                 .add(NotificationCenter.dialogFiltersUpdated)
-                .add(NotificationCenter.suggestedFiltersLoaded);
-            getMessagesController().loadSuggestedFilters();
-            observersGroup.add(NotificationCenter.updateInterfaces)
+                .add(NotificationCenter.updateInterfaces)
                 .add(NotificationCenter.encryptedChatUpdated)
                 .add(NotificationCenter.contactsDidLoad)
                 .add(NotificationCenter.appDidLogout)
@@ -2982,7 +2980,6 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         }
 
         BirthdayController.getInstance(currentAccount).check();
-        autoSeedDefaultFolders();
         additionNavigationBarHeight = hasMainTabs ? dp(MAIN_TABS_HEIGHT_WITH_MARGINS) : 0;
         additionFloatingButtonOffset = hasMainTabs ? dp(DialogsActivity.MAIN_TABS_HEIGHT + DialogsActivity.MAIN_TABS_MARGIN) : 0;
 
@@ -6982,6 +6979,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     @Override
     public void onResume() {
         super.onResume();
+        autoSeedDefaultFolders();
         if (dialogStoriesCell != null) {
             dialogStoriesCell.onResume();
         }
@@ -10423,8 +10421,6 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 filterTabsView.checkTabsCounter();
             }
             slowedReloadAfterDialogClick = false;
-        } else if (id == NotificationCenter.suggestedFiltersLoaded) {
-            autoSeedDefaultFolders();
         } else if (id == NotificationCenter.topicsDidLoaded) {
             updateVisibleRows(0);
         } else if (id == NotificationCenter.dialogsUnreadCounterChanged) {
