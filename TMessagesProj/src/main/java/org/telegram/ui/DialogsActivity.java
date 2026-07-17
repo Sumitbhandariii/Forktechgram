@@ -1597,48 +1597,61 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     }
 
     private void autoSeedDefaultFolders() {
-        if (getParentActivity() == null) {
-            return;
-        }
-        SharedPreferences prefs = MessagesController.getMainSettings(currentAccount);
-        if (prefs.getBoolean("foldersSeeded", false)) {
-            return;
-        }
-        prefs.edit().putBoolean("foldersSeeded", true).apply();
-        
-        android.widget.Toast.makeText(getParentActivity(), "Seeding started", android.widget.Toast.LENGTH_LONG).show();
+        try {
+            if (getParentActivity() == null) return;
+            if (getMessagesController().dialogFiltersById == null) return;
+            long selfId = UserConfig.getInstance(currentAccount).getClientUserId();
+            SharedPreferences prefs = MessagesController.getMainSettings(currentAccount);
+            String key = "foldersSeeded_" + selfId;
+            if (prefs.getBoolean(key, false)) return;
+            prefs.edit().putBoolean(key, true).apply();
 
-        int allTypes = MessagesController.DIALOG_FILTER_FLAG_CONTACTS
-            | MessagesController.DIALOG_FILTER_FLAG_NON_CONTACTS
-            | MessagesController.DIALOG_FILTER_FLAG_GROUPS
-            | MessagesController.DIALOG_FILTER_FLAG_CHANNELS
-            | MessagesController.DIALOG_FILTER_FLAG_BOTS;
+            android.widget.Toast.makeText(getParentActivity(), "Seeding started", android.widget.Toast.LENGTH_LONG).show();
 
-        createDefaultFolder("Unread", allTypes | MessagesController.DIALOG_FILTER_FLAG_EXCLUDE_READ);
-        createDefaultFolder("Groups", MessagesController.DIALOG_FILTER_FLAG_GROUPS);
-        createDefaultFolder("Channels", MessagesController.DIALOG_FILTER_FLAG_CHANNELS);
-        createDefaultFolder("Bots", MessagesController.DIALOG_FILTER_FLAG_BOTS);
+            int allTypes = MessagesController.DIALOG_FILTER_FLAG_CONTACTS
+                | MessagesController.DIALOG_FILTER_FLAG_NON_CONTACTS
+                | MessagesController.DIALOG_FILTER_FLAG_GROUPS
+                | MessagesController.DIALOG_FILTER_FLAG_CHANNELS
+                | MessagesController.DIALOG_FILTER_FLAG_BOTS;
+
+            createDefaultFolder("Unread", allTypes | MessagesController.DIALOG_FILTER_FLAG_EXCLUDE_READ);
+            createDefaultFolder("Groups", MessagesController.DIALOG_FILTER_FLAG_GROUPS);
+            createDefaultFolder("Channels", MessagesController.DIALOG_FILTER_FLAG_CHANNELS);
+            createDefaultFolder("Bots", MessagesController.DIALOG_FILTER_FLAG_BOTS);
+        } catch (Throwable t) {
+            if (getParentActivity() != null) {
+                android.widget.Toast.makeText(getParentActivity(), "Seed error: " + t, android.widget.Toast.LENGTH_LONG).show();
+            }
+        }
     }
 
     private void createDefaultFolder(String name, int flags) {
-        MessagesController.DialogFilter filter = new MessagesController.DialogFilter();
-        filter.name = name;
-        filter.entities = new ArrayList<>();
-        filter.id = 2;
-        while (getMessagesController().dialogFiltersById.get(filter.id) != null) {
-            filter.id++;
-        }
-        filter.order = getMessagesController().getDialogFilters().size();
-        filter.pendingUnreadCount = filter.unreadCount = -1;
-        filter.alwaysShow = new ArrayList<>();
-        filter.neverShow = new ArrayList<>();
-        filter.pinnedDialogs = new org.telegram.messenger.support.LongSparseIntArray();
-        filter.flags = flags;
-        filter.color = -1;
+        try {
+            MessagesController.DialogFilter filter = new MessagesController.DialogFilter();
+            filter.name = name;
+            filter.entities = new ArrayList<>();
+            filter.id = 2;
+            while (getMessagesController().dialogFiltersById.get(filter.id) != null) {
+                filter.id++;
+            }
+            filter.order = getMessagesController().getDialogFilters().size();
+            filter.pendingUnreadCount = filter.unreadCount = -1;
+            filter.alwaysShow = new ArrayList<>();
+            filter.neverShow = new ArrayList<>();
+            filter.pinnedDialogs = new org.telegram.messenger.support.LongSparseIntArray();
+            filter.flags = flags;
+            filter.color = -1;
 
-        FilterCreateActivity.saveFilterToServer(filter, filter.flags, filter.name, filter.entities, false, filter.color, filter.alwaysShow, filter.neverShow, filter.pinnedDialogs, true, true, true, true, false, this, () -> {
-            android.widget.Toast.makeText(getParentActivity(), "Created: " + name, android.widget.Toast.LENGTH_LONG).show();
-        });
+            FilterCreateActivity.saveFilterToServer(filter, filter.flags, filter.name, filter.entities, false, filter.color, filter.alwaysShow, filter.neverShow, filter.pinnedDialogs, true, true, true, true, false, this, () -> {
+                if (getParentActivity() != null) {
+                    android.widget.Toast.makeText(getParentActivity(), "Created: " + name, android.widget.Toast.LENGTH_LONG).show();
+                }
+            });
+        } catch (Throwable t) {
+            if (getParentActivity() != null) {
+                android.widget.Toast.makeText(getParentActivity(), "Fail " + name + ": " + t, android.widget.Toast.LENGTH_LONG).show();
+            }
+        }
     }
 
     private void updateStoriesViewAlpha(float alpha) {
@@ -6979,6 +6992,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     @Override
     public void onResume() {
         super.onResume();
+        AndroidUtilities.runOnUIThread(this::autoSeedDefaultFolders, 1500);
         autoSeedDefaultFolders();
         if (dialogStoriesCell != null) {
             dialogStoriesCell.onResume();
