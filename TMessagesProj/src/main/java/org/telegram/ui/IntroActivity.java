@@ -173,7 +173,6 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
             protected void onDraw(Canvas canvas) {
                 canvas.drawColor(0xFF2477fa);
             }
-        };
 
             @Override
             protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
