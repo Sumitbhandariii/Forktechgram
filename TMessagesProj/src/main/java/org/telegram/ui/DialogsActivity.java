@@ -1606,18 +1606,21 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             if (prefs.getBoolean(key, false)) return;
             prefs.edit().putBoolean(key, true).apply();
 
-            android.widget.Toast.makeText(getParentActivity(), "Seeding started", android.widget.Toast.LENGTH_LONG).show();
-
             int allTypes = MessagesController.DIALOG_FILTER_FLAG_CONTACTS
                 | MessagesController.DIALOG_FILTER_FLAG_NON_CONTACTS
                 | MessagesController.DIALOG_FILTER_FLAG_GROUPS
                 | MessagesController.DIALOG_FILTER_FLAG_CHANNELS
                 | MessagesController.DIALOG_FILTER_FLAG_BOTS;
 
-            createDefaultFolder("Unread", allTypes | MessagesController.DIALOG_FILTER_FLAG_EXCLUDE_READ);
-            createDefaultFolder("Groups", MessagesController.DIALOG_FILTER_FLAG_GROUPS);
-            createDefaultFolder("Channels", MessagesController.DIALOG_FILTER_FLAG_CHANNELS);
-            createDefaultFolder("Bots", MessagesController.DIALOG_FILTER_FLAG_BOTS);
+            int nextId = 2;
+            while (getMessagesController().dialogFiltersById.get(nextId) != null) {
+                nextId++;
+            }
+
+            createDefaultFolder("Unread", allTypes | MessagesController.DIALOG_FILTER_FLAG_EXCLUDE_READ, nextId++);
+            createDefaultFolder("Groups", MessagesController.DIALOG_FILTER_FLAG_GROUPS, nextId++);
+            createDefaultFolder("Channels", MessagesController.DIALOG_FILTER_FLAG_CHANNELS, nextId++);
+            createDefaultFolder("Bots", MessagesController.DIALOG_FILTER_FLAG_BOTS, nextId++);
         } catch (Throwable t) {
             if (getParentActivity() != null) {
                 android.widget.Toast.makeText(getParentActivity(), "Seed error: " + t, android.widget.Toast.LENGTH_LONG).show();
@@ -1625,15 +1628,12 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         }
     }
 
-    private void createDefaultFolder(String name, int flags) {
+    private void createDefaultFolder(String name, int flags, int id) {
         try {
             MessagesController.DialogFilter filter = new MessagesController.DialogFilter();
             filter.name = name;
             filter.entities = new ArrayList<>();
-            filter.id = 2;
-            while (getMessagesController().dialogFiltersById.get(filter.id) != null) {
-                filter.id++;
-            }
+            filter.id = id;
             filter.order = getMessagesController().getDialogFilters().size();
             filter.pendingUnreadCount = filter.unreadCount = -1;
             filter.alwaysShow = new ArrayList<>();
