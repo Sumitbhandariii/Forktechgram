@@ -169,7 +169,7 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
 
         int themeMargin = 4;
         frameContainerView = new FrameLayout(context) {
-            @override
+            @Override
             protected void onDraw(Canvas canvas) {
                 canvas.drawColor(0xFF2477fa);
             }
