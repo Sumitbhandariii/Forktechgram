@@ -171,7 +171,7 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
         frameContainerView = new FrameLayout(context) {
             @Override
             protected void onDraw(Canvas canvas) {
-                canvas.drawColor(0xFF2477fa);
+                super.onDraw(canvas);
             }
 
             @Override
@@ -203,6 +203,12 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
                 }
             }
         };
+
+        ImageView backgroundImageView = new ImageView(context);
+        backgroundImageView.setImageResource(R.drawable.my_multicolor_circle);
+        backgroundImageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        frameContainerView.addView(backgroundImageView, LayoutHelper.createFrame(100, 100, Gravity.CENTER));
+        
         scrollView.addView(frameContainerView, LayoutHelper.createScroll(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.LEFT | Gravity.TOP));
 
         darkThemeDrawable = new RLottieDrawable(R.raw.sun, String.valueOf(R.raw.sun), dp(28), dp(28), true, null);
