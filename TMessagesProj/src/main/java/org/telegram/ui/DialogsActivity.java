@@ -1606,21 +1606,23 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             if (prefs.getBoolean(key, false)) return;
             prefs.edit().putBoolean(key, true).apply();
 
+            int nextId = 2;
+            while (getMessagesController().dialogFiltersById.get(nextId) != null) {
+                nextId++;
+            }
+
             int allTypes = MessagesController.DIALOG_FILTER_FLAG_CONTACTS
                 | MessagesController.DIALOG_FILTER_FLAG_NON_CONTACTS
                 | MessagesController.DIALOG_FILTER_FLAG_GROUPS
                 | MessagesController.DIALOG_FILTER_FLAG_CHANNELS
                 | MessagesController.DIALOG_FILTER_FLAG_BOTS;
 
-            int nextId = 2;
-            while (getMessagesController().dialogFiltersById.get(nextId) != null) {
-                nextId++;
-            }
+            addLocalFolder("Unread", allTypes | MessagesController.DIALOG_FILTER_FLAG_EXCLUDE_READ, nextId++);
+            addLocalFolder("Groups", MessagesController.DIALOG_FILTER_FLAG_GROUPS, nextId++);
+            addLocalFolder("Channels", MessagesController.DIALOG_FILTER_FLAG_CHANNELS, nextId++);
+            addLocalFolder("Bots", MessagesController.DIALOG_FILTER_FLAG_BOTS, nextId++);
 
-            createDefaultFolder("Unread", allTypes | MessagesController.DIALOG_FILTER_FLAG_EXCLUDE_READ, nextId++);
-            createDefaultFolder("Groups", MessagesController.DIALOG_FILTER_FLAG_GROUPS, nextId++);
-            createDefaultFolder("Channels", MessagesController.DIALOG_FILTER_FLAG_CHANNELS, nextId++);
-            createDefaultFolder("Bots", MessagesController.DIALOG_FILTER_FLAG_BOTS, nextId++);
+            getNotificationCenter().postNotificationName(NotificationCenter.dialogFiltersUpdated);
         } catch (Throwable t) {
             if (getParentActivity() != null) {
                 android.widget.Toast.makeText(getParentActivity(), "Seed error: " + t, android.widget.Toast.LENGTH_LONG).show();
@@ -1628,30 +1630,22 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         }
     }
 
-    private void createDefaultFolder(String name, int flags, int id) {
-        try {
-            MessagesController.DialogFilter filter = new MessagesController.DialogFilter();
-            filter.name = name;
-            filter.entities = new ArrayList<>();
-            filter.id = id;
-            filter.order = getMessagesController().getDialogFilters().size();
-            filter.pendingUnreadCount = filter.unreadCount = -1;
-            filter.alwaysShow = new ArrayList<>();
-            filter.neverShow = new ArrayList<>();
-            filter.pinnedDialogs = new org.telegram.messenger.support.LongSparseIntArray();
-            filter.flags = flags;
-            filter.color = -1;
+    private void addLocalFolder(String name, int flags, int id) {
+        MessagesController.DialogFilter filter = new MessagesController.DialogFilter();
+        filter.id = id;
+        filter.name = name;
+        filter.flags = flags;
+        filter.order = getMessagesController().getDialogFilters().size();
+        filter.pendingUnreadCount = filter.unreadCount = -1;
+        filter.entities = new ArrayList<>();
+        filter.alwaysShow = new ArrayList<>();
+        filter.neverShow = new ArrayList<>();
+        filter.pinnedDialogs = new org.telegram.messenger.support.LongSparseIntArray();
+        filter.color = -1;
 
-            FilterCreateActivity.saveFilterToServer(filter, filter.flags, filter.name, filter.entities, false, filter.color, filter.alwaysShow, filter.neverShow, filter.pinnedDialogs, true, true, true, true, false, this, () -> {
-                if (getParentActivity() != null) {
-                    android.widget.Toast.makeText(getParentActivity(), "Created: " + name, android.widget.Toast.LENGTH_LONG).show();
-                }
-            });
-        } catch (Throwable t) {
-            if (getParentActivity() != null) {
-                android.widget.Toast.makeText(getParentActivity(), "Fail " + name + ": " + t, android.widget.Toast.LENGTH_LONG).show();
-            }
-        }
+        getMessagesController().dialogFilters.add(filter);
+        getMessagesController().dialogFiltersById.put(filter.id, filter);
+        getMessagesStorage().saveDialogFilter(filter, false, false);
     }
 
     private void updateStoriesViewAlpha(float alpha) {
