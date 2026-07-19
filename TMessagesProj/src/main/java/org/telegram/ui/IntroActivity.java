@@ -188,7 +188,6 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
             @Override
             public void onPageScrollStateChanged(int state) {
             }
-        }
 
         int themeMargin = 4;
         frameContainerView = new FrameLayout(context) {
