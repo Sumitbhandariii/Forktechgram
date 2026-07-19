@@ -166,7 +166,29 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
 
         RLottieImageView themeIconView = new RLottieImageView(context);
         FrameLayout themeFrameLayout = new FrameLayout(context);
+        final ImageView backgroundImageView = new ImageView(context);
+        backgroundImageView.setImageResource(R.drawable.my_multicolor_circle);
+        backgroundImageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        themeFrameLayout.addView(backgroundImageView, LayoutHelper.createFrame(32, 32, Gravity.CENTER));
         themeFrameLayout.addView(themeIconView, LayoutHelper.createFrame(28, 28, Gravity.CENTER));
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                if (position == 0) {
+                    backgroundImageView.setVisibility(android.view.View.VISIBLE);
+                } else {
+                    backgroundImageView.setVisibility(android.view.View.GONE);
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+            }
+        }
 
         int themeMargin = 4;
         frameContainerView = new FrameLayout(context) {
