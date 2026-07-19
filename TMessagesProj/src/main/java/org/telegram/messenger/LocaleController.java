@@ -1522,11 +1522,13 @@ public class LocaleController {
     private static final java.util.Set<String> KEEP_KEYS = new java.util.HashSet<>(java.util.Arrays.asList(
         "AuthAnotherClientInfo2", "TelegramPassportCreatePasswordInfo",
         "QRLoginSubtitle", "QRLoginStep1", "SessionsListInfo",
-        "TelegramVersion",
-        "TelegramFaq"
+        "TelegramVersion", "TelegramFaq",
+        "AuthAnotherClientInfo1", "AuthAnotherClientInfo4", "AuthAnotherClientInfo5",
+        "DidNotGetTheCodeInfo"
     ));
     private static final String[] PROTECTED_PHRASES = {
-        "Telegram Premium", "Telegram Stars", "Telegram Business", "Telegram Terms of Service"
+        "Telegram Premium", "Telegram Stars", "Telegram Business", "Telegram Terms of Service",
+        "Telegram Desktop", "Telegram Web", "Telegram Support"
     };
 
     private static String rebrand(String key, String value) {
