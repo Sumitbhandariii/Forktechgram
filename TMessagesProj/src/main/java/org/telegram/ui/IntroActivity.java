@@ -170,10 +170,6 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
 
         int themeMargin = 4;
         frameContainerView = new FrameLayout(context) {
-            @Override
-            protected void onDraw(Canvas canvas) {
-                super.onDraw(canvas);
-            }
 
             @Override
             protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
@@ -204,12 +200,6 @@ public class IntroActivity extends BaseFragment implements NotificationCenter.No
                 }
             }
         };
-
-        ImageView backgroundImageView = new ImageView(context);
-        backgroundImageView.setImageResource(R.drawable.my_multicolor_circle);
-        backgroundImageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        frameContainerView.addView(backgroundImageView, LayoutHelper.createFrame(100, 100, Gravity.CENTER));
-        
         scrollView.addView(frameContainerView, LayoutHelper.createScroll(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.LEFT | Gravity.TOP));
 
         darkThemeDrawable = new RLottieDrawable(R.raw.sun, String.valueOf(R.raw.sun), dp(28), dp(28), true, null);
