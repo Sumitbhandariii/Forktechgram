@@ -3141,7 +3141,7 @@ std::unique_ptr<TLObject> ConnectionsManager::wrapInLayer(TLObject *object, Data
             }
             request->query = std::unique_ptr<TLObject>(object);
             request->api_id = currentApiId;
-            request->app_version = "Novagram Android";
+            request->app_version = currentAppVersion;
             request->lang_code = currentLangCode;
             request->lang_pack = "android";
             request->system_lang_code = currentSystemLangCode;
@@ -3224,7 +3224,7 @@ std::unique_ptr<TLObject> ConnectionsManager::wrapInLayer(TLObject *object, Data
                 request->device_model = "n/a";
             }
             if (request->app_version.empty()) {
-                request->app_version = "Novagram Android";
+                request->app_version = "n/a";
             }
             if (request->system_version.empty()) {
                 request->system_version = "n/a";
