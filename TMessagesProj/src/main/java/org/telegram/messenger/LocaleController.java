@@ -1524,11 +1524,11 @@ public class LocaleController {
         "QRLoginSubtitle", "QRLoginStep1", "SessionsListInfo",
         "TelegramVersion", "TelegramFaq",
         "AuthAnotherClientInfo1", "AuthAnotherClientInfo4", "AuthAnotherClientInfo5",
-        "DidNotGetTheCodeInfo"
+        "DidNotGetTheCodeInfo", "SentAppCode"
     ));
     private static final String[] PROTECTED_PHRASES = {
         "Telegram Premium", "Telegram Stars", "Telegram Business", "Telegram Terms of Service",
-        "Telegram Desktop", "Telegram Web", "Telegram Support"
+        "Telegram Desktop", "Telegram Web", "Telegram Support", "Telegram FAQ"
     };
 
     private static String rebrand(String key, String value) {
