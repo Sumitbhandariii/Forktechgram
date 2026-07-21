@@ -1524,7 +1524,7 @@ public class LocaleController {
         "QRLoginSubtitle", "QRLoginStep1", "SessionsListInfo",
         "TelegramVersion", "TelegramFaq",
         "AuthAnotherClientInfo1", "AuthAnotherClientInfo4", "AuthAnotherClientInfo5",
-        "DidNotGetTheCodeInfo", "SentAppCode"
+        "DidNotGetTheCodeInfo", "SentAppCode", "SentAppCodeTitle"
     ));
     private static final String[] PROTECTED_PHRASES = {
         "Telegram Premium", "Telegram Stars", "Telegram Business", "Telegram Terms of Service",
