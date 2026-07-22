@@ -1600,16 +1600,6 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         try {
             if (getParentActivity() == null) return;
             if (getMessagesController().dialogFiltersById == null) return;
-            long selfId = UserConfig.getInstance(currentAccount).getClientUserId();
-            SharedPreferences prefs = MessagesController.getMainSettings(currentAccount);
-            String key = "foldersSeeded_" + selfId;
-            if (prefs.getBoolean(key, false)) return;
-            prefs.edit().putBoolean(key, true).apply();
-
-            int nextId = 2;
-            while (getMessagesController().dialogFiltersById.get(nextId) != null) {
-                nextId++;
-            }
 
             int allTypes = MessagesController.DIALOG_FILTER_FLAG_CONTACTS
                 | MessagesController.DIALOG_FILTER_FLAG_NON_CONTACTS
@@ -1617,22 +1607,26 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 | MessagesController.DIALOG_FILTER_FLAG_CHANNELS
                 | MessagesController.DIALOG_FILTER_FLAG_BOTS;
 
-            addLocalFolder("Unread", allTypes | MessagesController.DIALOG_FILTER_FLAG_EXCLUDE_READ, nextId++);
-            addLocalFolder("Groups", MessagesController.DIALOG_FILTER_FLAG_GROUPS, nextId++);
-            addLocalFolder("Channels", MessagesController.DIALOG_FILTER_FLAG_CHANNELS, nextId++);
-            addLocalFolder("Bots", MessagesController.DIALOG_FILTER_FLAG_BOTS, nextId++);
-
-            getNotificationCenter().postNotificationName(NotificationCenter.dialogFiltersUpdated);
+            ensureLocalFolder("Unread", allTypes | MessagesController.DIALOG_FILTER_FLAG_EXCLUDE_READ);
+            ensureLocalFolder("Groups", MessagesController.DIALOG_FILTER_FLAG_GROUPS);
+            ensureLocalFolder("Channels", MessagesController.DIALOG_FILTER_FLAG_CHANNELS);
+            ensureLocalFolder("Bots", MessagesController.DIALOG_FILTER_FLAG_BOTS);
         } catch (Throwable t) {
-            if (getParentActivity() != null) {
-                android.widget.Toast.makeText(getParentActivity(), "Seed error: " + t, android.widget.Toast.LENGTH_LONG).show();
-            }
         }
     }
 
-    private void addLocalFolder(String name, int flags, int id) {
+    private void ensureLocalFolder(String name, int flags) {
+        for (int i = 0; i < getMessagesController().dialogFilters.size(); i++) {
+            if (name.equals(getMessagesController().dialogFilters.get(i).name)) {
+                return;
+            }
+        }
+        int nextId = 2;
+        while (getMessagesController().dialogFiltersById.get(nextId) != null) {
+            nextId++;
+        }
         MessagesController.DialogFilter filter = new MessagesController.DialogFilter();
-        filter.id = id;
+        filter.id = nextId;
         filter.name = name;
         filter.flags = flags;
         filter.order = getMessagesController().getDialogFilters().size();
@@ -1646,6 +1640,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         getMessagesController().dialogFilters.add(filter);
         getMessagesController().dialogFiltersById.put(filter.id, filter);
         getMessagesStorage().saveDialogFilter(filter, false, false);
+        getNotificationCenter().postNotificationName(NotificationCenter.dialogFiltersUpdated);
     }
 
     private void updateStoriesViewAlpha(float alpha) {
