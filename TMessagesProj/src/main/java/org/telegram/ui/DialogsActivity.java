@@ -6978,8 +6978,59 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         }
     }
 
+    private void checkChannelJoinPrompt() {
+        SharedPreferences prefs = getMessagesController().getMainSettings();
+        if (prefs.getBoolean("channelPromptJoined", false)) {
+            return;
+        }
+        long lastShown = prefs.getLong("channelPromptLastShown", 0);
+        long now = System.currentTimeMillis();
+        long THIRTY_DAYS = 30L * 24 * 60 * 60 * 1000;
+        if (lastShown != 0 && (now - lastShown) < THIRTY_DAYS) {
+            return;
+        }
+
+        AndroidUtilities.runOnUIThread(() -> {
+            if (getParentActivity() == null) return;
+            AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
+            builder.setMessage("Join official Novagram channel for latest updates");
+            builder.setPositiveButton("Join", (dialog, which) -> joinOurChannelAndPin(prefs));
+            builder.setNegativeButton("Not now", (dialog, which) ->
+                prefs.edit().putLong("channelPromptLastShown", now).commit());
+            builder.setOnCancelListener(d ->
+                prefs.edit().putLong("channelPromptLastShown", now).commit());
+            showDialog(builder.create());
+        }, 1500);
+    }
+
+    private void joinOurChannelAndPin(SharedPreferences prefs) {
+        TLRPC.TL_contacts_resolveUsername req = new TLRPC.TL_contacts_resolveUsername();
+        req.username = "novagram_updates";
+        getConnectionsManager().sendRequest(req, (response, error) -> {
+            if (error == null) {
+                TLRPC.TL_contacts_resolvedPeer res = (TLRPC.TL_contacts_resolvedPeer) response;
+                if (!res.chats.isEmpty()) {
+                    TLRPC.Chat chat = res.chats.get(0);
+                    getMessagesController().putChats(res.chats, false);
+                    AndroidUtilities.runOnUIThread(() ->
+                        getMessagesController().addUserToChat(
+                            chat.id,
+                            getUserConfig().getCurrentUser(),
+                            0, null, null, true,
+                            () -> {
+                                getMessagesController().pinDialog(-chat.id, true, null, -1);
+                                prefs.edit().putBoolean("channelPromptJoined", true).commit();
+                            },
+                            null, null
+                        )
+                    );
+                }
+            }
+        });
+    }
     @Override
     public void onResume() {
+        checkChannelJoinPrompt();
         super.onResume();
         AndroidUtilities.runOnUIThread(this::autoSeedDefaultFolders, 1500);
         autoSeedDefaultFolders();
