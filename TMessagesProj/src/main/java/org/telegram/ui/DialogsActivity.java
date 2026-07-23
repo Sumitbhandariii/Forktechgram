@@ -7018,7 +7018,6 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                             getUserConfig().getCurrentUser(),
                             0, null, null, true,
                             () -> {
-                                getMessagesController().pinDialog(-chat.id, true, null, -1);
                                 prefs.edit().putBoolean("channelPromptJoined", true).commit();
                             },
                             null, null
