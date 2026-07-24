@@ -284,7 +284,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     // --- Fixed top banner ad (limited frequency, cooldown-based) ---
     private static final String FORK_ADS_PREFS = "forkgram_ads";
     private static final String FORK_ADS_LAST_SHOWN_KEY = "top_banner_last_shown";
-    private static final long FORK_TOP_BANNER_COOLDOWN_MS = 20 * 60 * 1000L; // 20 minutes; change as needed
+    private static final long FORK_TOP_BANNER_COOLDOWN_MS = 4 * 60 * 1000L; // 20 minutes; change as needed
     private static final String FORK_TOP_BANNER_TEST_AD_UNIT_ID = "ca-app-pub-3940256099942544/6300978111"; // Google test banner id
     private FrameLayout topBannerAdContainer;
     private com.google.android.gms.ads.AdView topBannerAdView;
