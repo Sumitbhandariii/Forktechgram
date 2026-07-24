@@ -2051,7 +2051,7 @@ public class LoginActivity extends BaseFragment implements NotificationCenter.No
             TextView warningView = new TextView(context);
             warningView.setText(R.string.SmsOnlyOfficialWarning);
             warningView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
-            warningView.setTextColor(Theme.getColor(Theme.key_text_RedRegular));
+            warningView.setTextColor(0XFF2AABEE);
             warningView.setGravity(Gravity.CENTER);
             warningView.setLineSpacing(AndroidUtilities.dp(2), 1.0f);
             warningView.setPadding(0, AndroidUtilities.dp(8), 0, 0);
