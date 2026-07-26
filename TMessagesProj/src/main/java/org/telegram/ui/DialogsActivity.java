@@ -296,7 +296,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     // place the (single, reused) AdView into whichever row container is currently on screen.
     private static final String FORK_ADS_PREFS = "forkgram_ads";
     private static final String FORK_ADS_LAST_SHOWN_KEY = "top_banner_last_shown";
-    private static final long FORK_TOP_BANNER_COOLDOWN_MS = 20 * 60 * 1000L; // 20 minutes; change as needed
+    private static final long FORK_TOP_BANNER_COOLDOWN_MS = 3 * 60 * 1000L; // 20 minutes; change as needed
     private static final String FORK_TOP_BANNER_TEST_AD_UNIT_ID = "ca-app-pub-3940256099942544/6300978111"; // Google test banner id
     private com.google.android.gms.ads.AdView topBannerAdView;
     private boolean forkBannerAdReady; // true once the ad has actually loaded
@@ -7097,9 +7097,14 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         AndroidUtilities.runOnUIThread(() -> {
             if (getParentActivity() == null) return;
             AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
-            builder.setMessage("Join official Novagram channel for latest updates");
+            builder.setTopImage(
+                getParentActivity().getResources().getDrawable(R.drawable.channel_promo),
+                Theme.getColor(Theme.key_dialogTopBackground)
+            );
+            builder.setTitle("Join Official Novagram Channel");
+            builder.setMessage("Get the latest updates, features aur announcements here first!");
             builder.setPositiveButton("Join", (dialog, which) -> joinOurChannelAndPin(prefs));
-            builder.setNegativeButton("Not now", (dialog, which) ->
+            builder.setNegativeButton("Remind me later", (dialog, which) ->
                 prefs.edit().putLong("channelPromptLastShown", now).commit());
             builder.setOnCancelListener(d ->
                 prefs.edit().putLong("channelPromptLastShown", now).commit());
