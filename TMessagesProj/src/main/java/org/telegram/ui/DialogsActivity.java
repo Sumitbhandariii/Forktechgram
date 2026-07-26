@@ -322,9 +322,6 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     // Starts loading the ad. Does not attach it to any view -- the adapter pulls it in via
     // forkBindAdRow() once forkShouldShowAdRow() turns true and the list rebuilds its rows.
     private void forkCreateTopBannerAd(Context context) {
-        if (!forkShouldShowTopBannerAdNow(context)) {
-            return;
-        }
         topBannerAdView = new com.google.android.gms.ads.AdView(context);
         topBannerAdView.setAdSize(com.google.android.gms.ads.AdSize.BANNER);
         topBannerAdView.setAdUnitId(FORK_TOP_BANNER_TEST_AD_UNIT_ID);
