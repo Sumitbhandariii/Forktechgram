@@ -295,8 +295,13 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     // asks forkShouldShowAdRow() whether to include the row, and forkBindAdRow(container) to
     // place the (single, reused) AdView into whichever row container is currently on screen.
     private static final String FORK_ADS_PREFS = "forkgram_ads";
+    private com.google.android.gms.ads.interstitial.InterstitialAd forkInterstitialAd;
+    private static final String FORK_INTERSTITIAL_TEST_AD_UNIT_ID = "ca-app-pub-3940256099942544/1033173712"; // Google test interstitial id
+    private static final long FORK_INTERSTITIAL_COOLDOWN_MS = 3L * 24 * 60 * 60 * 1000; // 3 days
+    private static final String FORK_INTERSTITIAL_LAST_SHOWN_KEY = "interstitial_last_shown";
+    private static final String FORK_INTERSTITIAL_CLOSE_COUNT_KEY = "interstitial_close_count";
     private static final String FORK_ADS_LAST_SHOWN_KEY = "top_banner_last_shown";
-    private static final long FORK_TOP_BANNER_COOLDOWN_MS = 3 * 60 * 1000L; // 20 minutes; change as needed
+    private static final long FORK_TOP_BANNER_COOLDOWN_MS = 1 * 60 * 1000L; // 20 minutes; change as needed
     private static final String FORK_TOP_BANNER_TEST_AD_UNIT_ID = "ca-app-pub-3940256099942544/6300978111"; // Google test banner id
     private com.google.android.gms.ads.AdView topBannerAdView;
     private boolean forkBannerAdReady; // true once the ad has actually loaded
@@ -338,6 +343,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             }
         });
         topBannerAdView.loadAd(new com.google.android.gms.ads.AdRequest.Builder().build());
+        forkScheduleAdRefresh(context);
     }
 
     // Called by DialogsAdapter.updateItemList() to decide whether to include the ad row.
@@ -374,6 +380,72 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 vp.dialogsAdapter.notifyDataSetChanged();
             }
         }
+    }
+
+    private Runnable forkAdRefreshRunnable;
+
+    private void forkScheduleAdRefresh(Context context) {
+        if (forkAdRefreshRunnable != null) {
+            AndroidUtilities.cancelRunOnUIThread(forkAdRefreshRunnable);
+        }
+        forkAdRefreshRunnable = () -> {
+            if (topBannerAdView != null) {
+                topBannerAdView.loadAd(new com.google.android.gms.ads.AdRequest.Builder().build());
+                forkMarkTopBannerAdShown(context);
+            }
+            forkScheduleAdRefresh(context); // reschedule -> repeats forever while screen exists
+        };
+        AndroidUtilities.runOnUIThread(forkAdRefreshRunnable, FORK_TOP_BANNER_COOLDOWN_MS);
+    }
+
+    private void forkPreloadInterstitial(Context context) {
+        com.google.android.gms.ads.interstitial.InterstitialAd.load(
+                context,
+                FORK_INTERSTITIAL_TEST_AD_UNIT_ID,
+                new com.google.android.gms.ads.AdRequest.Builder().build(),
+                new com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback() {
+                    @Override
+                    public void onAdLoaded(com.google.android.gms.ads.interstitial.InterstitialAd ad) {
+                        forkInterstitialAd = ad;
+                    }
+                    @Override
+                    public void onAdFailedToLoad(com.google.android.gms.ads.LoadAdError loadAdError) {
+                        forkInterstitialAd = null;
+                    }
+                });
+    }
+
+    // true = is back-press ko rok kar ad dikhaya; false = normal exit hone do
+    private boolean forkMaybeShowExitInterstitial(boolean invoked) {
+        if (!invoked) return false;
+        Activity activity = getParentActivity();
+        if (activity == null || forkInterstitialAd == null) return false;
+
+        Context context = activity;
+        SharedPreferences prefs = context.getSharedPreferences(FORK_ADS_PREFS, Context.MODE_PRIVATE);
+        long lastShown = prefs.getLong(FORK_INTERSTITIAL_LAST_SHOWN_KEY, 0L);
+        if (System.currentTimeMillis() - lastShown < FORK_INTERSTITIAL_COOLDOWN_MS) {
+            return false; // 3 din pure nahi hue
+        }
+        int closeCount = prefs.getInt(FORK_INTERSTITIAL_CLOSE_COUNT_KEY, 0) + 1;
+        if (closeCount < 2) {
+            prefs.edit().putInt(FORK_INTERSTITIAL_CLOSE_COUNT_KEY, closeCount).apply();
+            return false; // ye 1st close tha, skip
+        }
+        prefs.edit().putInt(FORK_INTERSTITIAL_CLOSE_COUNT_KEY, 0)
+                .putLong(FORK_INTERSTITIAL_LAST_SHOWN_KEY, System.currentTimeMillis()).apply();
+
+        com.google.android.gms.ads.interstitial.InterstitialAd adToShow = forkInterstitialAd;
+        forkInterstitialAd = null;
+        adToShow.setFullScreenContentCallback(new com.google.android.gms.ads.FullScreenContentCallback() {
+            @Override
+            public void onAdDismissedFullScreenContent() {
+                forkPreloadInterstitial(context);
+                activity.finish(); // ad ke baad app close -- agar aapka exit tareeka alag hai to ye line badal dein
+            }
+        });
+        adToShow.show(activity);
+        return true;
     }
     // --- end fixed top banner ad ---
 
@@ -3175,6 +3247,10 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             topBannerAdView.destroy();
             topBannerAdView = null;
         }
+        if (forkAdRefreshRunnable != null) {
+            AndroidUtilities.cancelRunOnUIThread(forkAdRefreshRunnable);
+            forkAdRefreshRunnable = null;
+        }
         if (observersGroup != null) {
             observersGroup.removeAllObservers();
             observersGroup = null;
@@ -5434,6 +5510,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         //}
         if (!onlySelect && !inPreviewMode) {
             forkCreateTopBannerAd(context);
+            forkPreloadInterstitial(context);
         }
         if (!onlySelect) {
             animatedStatusView = new AnimatedStatusView(context, 20, 60);
@@ -7429,6 +7506,8 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             if (invoked) commentView.hidePopup(true);
             return false;
         } else if (dialogStoriesCell.isFullExpanded() && dialogStoriesCell.scrollToFirst()) {
+            return false;
+        } else if (forkMaybeShowExitInterstitial(invoked)) {
             return false;
         }
         return super.onBackPressed(invoked);
