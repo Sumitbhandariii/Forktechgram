@@ -174,6 +174,8 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
     private ImageLocation uploadingImageLocation;
     private com.google.android.gms.ads.interstitial.InterstitialAd interstitialAd;
     private boolean subSettingOpened = false;
+    private long lastAdShownTime = 0;
+    private static final long AD_COOLDOWN_MS = 4 * 60 * 1000; // 4 minutes
 
     private FrameLayout topView;
     private FrameLayout avatarContainer;
@@ -912,9 +914,11 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
         super.onResume();
         if (subSettingOpened) {
             subSettingOpened = false;
-            if (interstitialAd != null) {
+            long now = System.currentTimeMillis();
+            if (interstitialAd != null && (now - lastAdShownTime) >= AD_COOLDOWN_MS) {
                 interstitialAd.show(getParentActivity());
                 interstitialAd = null;
+                lastAdShownTime = now;
             }
         }
         if (interstitialAd == null) {
