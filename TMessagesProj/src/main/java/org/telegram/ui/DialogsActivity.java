@@ -7176,9 +7176,8 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
                 Theme.getColor(Theme.key_dialogTopBackground)
             );
             builder.setTitle("Join Official Novagram Channel");
-            builder.setMessage("Get the latest updates, features aur announcements here first!");
+            builder.setMessage("Get the latest updates, features and announcements here first!");
             builder.setPositiveButton("Join", (dialog, which) -> joinOurChannelAndPin(prefs));
-            builder.setNegativeButton("Remind me later", (dialog, which) ->
                 prefs.edit().putLong("channelPromptLastShown", now).commit());
             builder.setOnCancelListener(d ->
                 prefs.edit().putLong("channelPromptLastShown", now).commit());
