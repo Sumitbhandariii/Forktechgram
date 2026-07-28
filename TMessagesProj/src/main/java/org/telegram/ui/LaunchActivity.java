@@ -5999,24 +5999,52 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
 
     private boolean firstAppUpdateCheck = true;
     public void checkAppUpdate(boolean force, Browser.Progress progress) {
-        final int accountNum = currentAccount;
-        AppUpdater.checkNewVersion(this, getBaseContext(), (builder) -> {
-            showAlertDialog(builder);
-            return 0;
-        }, (update) -> {
-            if (update == null) {
-                return 0;
+        if (!BuildVars.CHECK_UPDATES) return;
+        SharedPreferences prefs = MessagesController.getGlobalMainSettings();
+        long lastShown = prefs.getLong("updatePromptLastShown", 0);
+        long now = System.currentTimeMillis();
+        long FIFTEEN_DAYS = 20L * 24 * 60 * 60 * 1000;
+        if (!force && lastShown != 0 && (now - lastShown) < FIFTEEN_DAYS) return;
+
+        com.google.android.play.core.appupdate.AppUpdateManager appUpdateManager =
+            com.google.android.play.core.appupdate.AppUpdateManagerFactory.create(this);
+        appUpdateManager.getAppUpdateInfo().addOnSuccessListener(appUpdateInfo -> {
+            if (appUpdateInfo.updateAvailability() == com.google.android.play.core.install.model.UpdateAvailability.UPDATE_AVAILABLE) {
+                int versionCode = appUpdateInfo.availableVersionCode();
+                Utilities.globalQueue.postRunnable(() -> {
+                    String changelog = "Bug fixes and improvements.";
+                    try {
+                        java.net.URL url = new java.net.URL("https://raw.githubusercontent.com/Sumitbhandariii/Forktechgram/main/changelog.txt");
+                        java.io.BufferedReader r = new java.io.BufferedReader(new java.io.InputStreamReader(url.openStream()));
+                        StringBuilder sb = new StringBuilder();
+                        String line;
+                        while ((line = r.readLine()) != null) sb.append(line).append("\n");
+                        r.close();
+                        if (sb.length() > 0) changelog = sb.toString().trim();
+                    } catch (Exception ignore) {}
+                    final String finalChangelog = changelog;
+                    AndroidUtilities.runOnUIThread(() -> showUpdateAvailableDialog(versionCode, finalChangelog, prefs, now));
+                });
             }
-            if (SharedConfig.pendingAppUpdate != null && SharedConfig.pendingAppUpdate.version != null
-                    && SharedConfig.pendingAppUpdate.version.equals(update.version)) {
-                return 0;
+        });
+    }
+
+    private void showUpdateAvailableDialog(int versionCode, String changelog, SharedPreferences prefs, long now) {
+        if (getParentActivity() == null) return;
+        AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
+        builder.setTopImage(getResources().getDrawable(R.drawable.channel_promo), Theme.getColor(Theme.key_dialogTopBackground));
+        builder.setTitle("Update Novagram");
+        builder.setMessage("Version " + versionCode + " • Play Store\n\n" + changelog);
+        builder.setPositiveButton("Download Now", (dialog, which) -> {
+            String pkg = getParentActivity().getPackageName();
+            try {
+                getParentActivity().startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + pkg)));
+            } catch (Exception e) {
+                getParentActivity().startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + pkg)));
             }
-            if (SharedConfig.setNewAppVersionAvailable(update)) {
-                ApplicationLoader.applicationLoaderInstance.showUpdateAppPopup(LaunchActivity.this, update, accountNum);
-                NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.appUpdateAvailable);
-            }
-            return 0;
-        }, force);
+        });
+        builder.setOnCancelListener(d -> prefs.edit().putLong("updatePromptLastShown", now).commit());
+        showDialog(builder.create());
     }
 
     // Never be called.
