@@ -696,7 +696,7 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
             FrameLayout adContainer = new FrameLayout(getParentActivity());
             com.google.android.gms.ads.AdView adView = new com.google.android.gms.ads.AdView(getParentActivity());
             adView.setAdSize(com.google.android.gms.ads.AdSize.BANNER);
-            adView.setAdUnitId("ca-app-pub-3940256099942544/6300978111");
+            adView.setAdUnitId("ca-app-pub-8212461864193378/7121354807");
             adContainer.addView(adView);
             adView.loadAd(new com.google.android.gms.ads.AdRequest.Builder().build());
             items.add(UItem.asCustom(adContainer));
@@ -898,7 +898,7 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
     private void loadInterstitialAd() {
         com.google.android.gms.ads.interstitial.InterstitialAd.load(
             getParentActivity(),
-            "ca-app-pub-3940256099942544/1033173712",
+            "ca-app-pub-8212461864193378/1893114248",
             new com.google.android.gms.ads.AdRequest.Builder().build(),
             new com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback() {
                 @Override
