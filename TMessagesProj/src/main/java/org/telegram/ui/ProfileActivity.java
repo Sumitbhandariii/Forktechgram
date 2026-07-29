@@ -13114,7 +13114,7 @@ public class ProfileActivity extends BaseFragment implements NotificationCenter.
                     adContainer.setBackgroundColor(getThemedColor(Theme.key_windowBackgroundWhite));
                     com.google.android.gms.ads.AdView adView = new com.google.android.gms.ads.AdView(mContext);
                     adView.setAdSize(com.google.android.gms.ads.AdSize.BANNER);
-                    adView.setAdUnitId("ca-app-pub-3940256099942544/6300978111");
+                    adView.setAdUnitId("ca-app-pub-8212461864193378/7121354807");
                     FrameLayout.LayoutParams adLayoutParams = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.CENTER);
                     adContainer.addView(adView, adLayoutParams);
                     adView.loadAd(new com.google.android.gms.ads.AdRequest.Builder().build());
