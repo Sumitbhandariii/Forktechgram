@@ -297,11 +297,11 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
     private static final String FORK_ADS_PREFS = "forkgram_ads";
     private com.google.android.gms.ads.interstitial.InterstitialAd forkInterstitialAd;
     private static final String FORK_INTERSTITIAL_TEST_AD_UNIT_ID = "ca-app-pub-8212461864193378/5856108669"; // Google test interstitial id
-    private static final long FORK_INTERSTITIAL_COOLDOWN_MS = 1L * 24 * 60 * 60 * 1000; // 3 days
+    private static final long FORK_INTERSTITIAL_COOLDOWN_MS = 2L * 60 * 60 * 1000; // 3 days
     private static final String FORK_INTERSTITIAL_LAST_SHOWN_KEY = "interstitial_last_shown";
     private static final String FORK_INTERSTITIAL_CLOSE_COUNT_KEY = "interstitial_close_count";
     private static final String FORK_ADS_LAST_SHOWN_KEY = "top_banner_last_shown";
-    private static final long FORK_TOP_BANNER_COOLDOWN_MS = 1 * 60 * 1000L; // 20 minutes; change as needed
+    private static final long FORK_TOP_BANNER_COOLDOWN_MS = 2 * 60 * 1000L; // 20 minutes; change as needed
     private static final String FORK_TOP_BANNER_TEST_AD_UNIT_ID = "ca-app-pub-8212461864193378/7169190336"; // Google test banner id
     private com.google.android.gms.ads.AdView topBannerAdView;
     private boolean forkBannerAdReady; // true once the ad has actually loaded
