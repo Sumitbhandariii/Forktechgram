@@ -100,10 +100,6 @@ jobs:
             set +x
             pip install requests tgcrypto-pyrofork Kurigram
             cp app.apk "Novagram $(cat ver.txt)${{ matrix.name }}.apk"
-            echo "${{ secrets.BASE64_ZIP }}" | base64 --decode > output.zip
-            unzip -j output.zip -d .
-            ls
-            python3 upload.py
             set -x
           else
             echo "Skipping channel upload (no [Release] marker in commit message)."
