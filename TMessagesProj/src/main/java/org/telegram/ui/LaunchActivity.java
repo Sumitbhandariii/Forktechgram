@@ -6030,21 +6030,20 @@ public class LaunchActivity extends BasePermissionsActivity implements INavigati
     }
 
     private void showUpdateAvailableDialog(int versionCode, String changelog, SharedPreferences prefs, long now) {
-        if (getParentActivity() == null) return;
-        AlertDialog.Builder builder = new AlertDialog.Builder(getParentActivity());
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTopImage(getResources().getDrawable(R.drawable.channel_promo), Theme.getColor(Theme.key_dialogTopBackground));
         builder.setTitle("Update Novagram");
         builder.setMessage("Version " + versionCode + " • Play Store\n\n" + changelog);
         builder.setPositiveButton("Download Now", (dialog, which) -> {
-            String pkg = getParentActivity().getPackageName();
+            String pkg = getPackageName();
             try {
-                getParentActivity().startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + pkg)));
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + pkg)));
             } catch (Exception e) {
-                getParentActivity().startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + pkg)));
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + pkg)));
             }
         });
         builder.setOnCancelListener(d -> prefs.edit().putLong("updatePromptLastShown", now).commit());
-        showDialog(builder.create());
+        showAlertDialog(builder);
     }
 
     // Never be called.
