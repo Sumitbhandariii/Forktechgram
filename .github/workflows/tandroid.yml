@@ -98,7 +98,6 @@ jobs:
           # Upload to channel.
           if [[ "${{ contains(github.event.head_commit.message, '[Release]') }}" == "true" ]]; then
             set +x
-            pip install requests tgcrypto-pyrofork Kurigram
             cp app.apk "Novagram $(cat ver.txt)${{ matrix.name }}.apk"
             set -x
           else
