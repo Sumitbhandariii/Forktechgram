@@ -114,9 +114,7 @@ jobs:
         if: matrix.type == 'release'
         run: |
           ./gradlew :TMessagesProj_App:bundleAfatRelease
-          echo "===== Bundle Files ====="
-          find TMessagesProj_App/build/outputs/bundle -type f
-          cp TMessagesProj_App/build/outputs/bundle/afatRelease/app.aab "artifact/Novagram $(cat ver.txt)${{ matrix.name }}.aab"
+          cp TMessagesProj_App/build/outputs/bundle/afatRelease/*.aab "artifact/Novagram $(cat ver.txt)${{ matrix.name }}.aab"
           
       - name: Attest build provenance
         if: true
