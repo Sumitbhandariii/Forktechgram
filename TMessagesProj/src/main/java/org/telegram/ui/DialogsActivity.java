@@ -7177,10 +7177,13 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
             );
             builder.setTitle("Join Official Novagram Channel");
             builder.setMessage("Get the latest updates, features and announcements here first!");
-            builder.setPositiveButton("Join", (dialog, which) -> joinOurChannelAndPin(prefs));
+            builder.setPositiveButton("Join", (dialog, which) -> {
+                joinOurChannelAndPin(prefs);
                 prefs.edit().putLong("channelPromptLastShown", now).commit();
-            builder.setOnCancelListener(d ->
+            });
+            builder.setOnCancelListener(d -> {
                 prefs.edit().putLong("channelPromptLastShown", now).commit();
+            });
             showDialog(builder.create());
         }, 1500);
     }
