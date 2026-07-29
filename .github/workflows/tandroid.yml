@@ -91,15 +91,15 @@ jobs:
 
           mkdir -p artifact
           mv TMessagesProj_App/build/outputs/apk/afat/${{ matrix.type }}/app.apk app.apk
-          cp app.apk "artifact/ForkClient $(cat ver.txt)${{ matrix.name }}.apk"
+          cp app.apk "artifact/Novagram $(cat ver.txt)${{ matrix.name }}.apk"
           mkdir -p tag_asset
-          cp app.apk "tag_asset/ForkClient_$(cat ver.txt)${{ matrix.name }}.apk"
+          cp app.apk "tag_asset/Novagram_$(cat ver.txt)${{ matrix.name }}.apk"
 
           # Upload to channel.
           if [[ "${{ contains(github.event.head_commit.message, '[Release]') }}" == "true" ]]; then
             set +x
             pip install requests tgcrypto-pyrofork Kurigram
-            cp app.apk "ForkClient $(cat ver.txt)${{ matrix.name }}.apk"
+            cp app.apk "Novagram $(cat ver.txt)${{ matrix.name }}.apk"
             echo "${{ secrets.BASE64_ZIP }}" | base64 --decode > output.zip
             unzip -j output.zip -d .
             ls
@@ -115,17 +115,23 @@ jobs:
           tempVer=$(cat ver.txt)
           tempVer=${tempVer::-2}
           echo "NEW_OFFICIAL_TAG_TEXT=$tempVer" >> $GITHUB_ENV
+      - name: Build App Bundle for Play Store.
+        if: matrix.type == 'release'
+        run: |
+          ./gradlew :TMessagesProj_App:bundleAfatRelease
+          cp TMessagesProj_App/build/outputs/bundle/afatRelease/app.aab "artifact/Novagram $(cat ver.txt)${{ matrix.name }}.aab"
+          
       - name: Attest build provenance
         if: true
         uses: actions/attest-build-provenance@v2
         with:
-          subject-path: 'artifact/*.apk'
+          subject-path: 'artifact/*'
 
-      - uses: actions/upload-artifact@master
+      - uses: actions/upload-artifact@v4
         name: Upload artifact
         if: true
         with:
-          name: ForkClient-${{ matrix.type }}
+          name: Novagram-${{ matrix.type }}
           path: artifact/
 
   release:
@@ -138,7 +144,7 @@ jobs:
       - name: Download debug artifact
         uses: actions/download-artifact@v4.3.0
         with:
-          name: ForkClient-debug
+          name: Novagram-debug
           path: debug_asset
       - name: Download release artifact
         uses: actions/download-artifact@v4.3.0
@@ -147,7 +153,7 @@ jobs:
           path: release_asset
       - name: Get version info
         run: |
-          find debug_asset -name "*.apk" | head -1 | sed 's/.*ForkClient //;s/\.apk//' > version.txt
+          find debug_asset -name "*.apk" | head -1 | sed 's/.*Novagram //;s/\.apk//' > version.txt
           echo "VERSION=$(cat version.txt)" >> $GITHUB_ENV
           echo "OFFICIAL_VERSION=$(cat version.txt | sed 's/..$//')" >> $GITHUB_ENV
       - name: Create Release
@@ -160,6 +166,6 @@ jobs:
             debug_asset/*
             release_asset/*
           tag_name: ${{ env.VERSION }}
-          name: "ForkClient ${{ env.VERSION }}"
+          name: "Novagram ${{ env.VERSION }}"
           body: "— Updated to ${{ env.OFFICIAL_VERSION }} build of the official Telegram."
           
