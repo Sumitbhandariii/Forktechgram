@@ -69,7 +69,7 @@
     <string name="BotSetPlatformAbout">Please restart after change to apply a new platform for the current bot.</string>
     <string name="BotCopyUrl">Copy every clicked link</string>
     <string name="DisableDefaultInAppBrowser">Open links in system browser</string>
-    <string name="SmsOnlyOfficialWarning">Note: SMS verification is limited to ONLY official mobile apps</string>
+    <string name="SmsOnlyOfficialWarning">Verification code will send via Telegram chat Open your Telegram app to view it</string>
     <string name="ThirdParty">Third-party</string>
     <string name="EnableLastSeenDots">Enable colored last seen dots</string>
     <string name="HideStoriesInArchive">Hide Stories in Archive</string>
@@ -2549,7 +2549,7 @@
     <string name="TelegramFAQ">Telegram FAQ</string>
     <string name="TelegramFaq">Telegram FAQ</string>
     <string name="TelegramFeatures">Telegram Features</string>
-    <string name="TelegramFeaturesUrl">https://t.me/TelegramTips</string>
+    <string name="TelegramFeaturesUrl">https://t.me/novagram_updates</string>
     <string name="AddAccount">Add Account</string>
     <string name="SwitchAccountHint">"Long tap to switch accounts"</string>
     <string name="SelectAccount">Select Account</string>

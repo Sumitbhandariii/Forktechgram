@@ -103,7 +103,8 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter implements
             VIEW_TYPE_STORIES = 18,
             VIEW_TYPE_ARCHIVE_FULLSCREEN = 19,
             VIEW_TYPE_GRAY_SECTION = 20,
-            VIEW_TYPE_FORWARD_TO_STORIES_CELL = 21;
+            VIEW_TYPE_FORWARD_TO_STORIES_CELL = 21,
+            VIEW_TYPE_FORK_AD = 22;
 
     private Context mContext;
     private ArchiveHintCell archiveHintCell;
@@ -121,6 +122,7 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter implements
     private ArrayList<Long> selectedDialogs;
     private boolean hasHints;
     private boolean hasChatlistHint;
+    private boolean hasForkAdRow;
     private int currentAccount;
     private boolean dialogsListFrozen;
     private boolean isReordering;
@@ -171,6 +173,9 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter implements
     }
 
     public int fixPosition(int position) {
+        if (hasForkAdRow) {
+            position--;
+        }
         if (hasChatlistHint) {
             position--;
         }
@@ -572,7 +577,7 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter implements
         return viewType != VIEW_TYPE_FLICKER && viewType != VIEW_TYPE_EMPTY && viewType != VIEW_TYPE_DIVIDER &&
                 viewType != VIEW_TYPE_SHADOW && viewType != VIEW_TYPE_HEADER &&
                 viewType != VIEW_TYPE_LAST_EMPTY && viewType != VIEW_TYPE_CONTACTS_FLICKER &&
-                viewType != VIEW_TYPE_REQUIREMENTS && viewType != VIEW_TYPE_REQUIRED_EMPTY && viewType != VIEW_TYPE_STORIES && viewType != VIEW_TYPE_ARCHIVE_FULLSCREEN && viewType != VIEW_TYPE_GRAY_SECTION;
+                viewType != VIEW_TYPE_REQUIREMENTS && viewType != VIEW_TYPE_REQUIRED_EMPTY && viewType != VIEW_TYPE_STORIES && viewType != VIEW_TYPE_ARCHIVE_FULLSCREEN && viewType != VIEW_TYPE_GRAY_SECTION && viewType != VIEW_TYPE_FORK_AD;
     }
 
     @Override
@@ -717,6 +722,10 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter implements
                 };
                 break;
             }
+            case VIEW_TYPE_FORK_AD: {
+                view = new FrameLayout(mContext);
+                break;
+            }
             case VIEW_TYPE_TEXT:
             default: {
                 view = new TextCell(mContext);
@@ -757,6 +766,12 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter implements
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int i) {
         switch (holder.getItemViewType()) {
+            case VIEW_TYPE_FORK_AD: {
+                if (parentFragment != null) {
+                    parentFragment.forkBindAdRow((FrameLayout) holder.itemView);
+                }
+                break;
+            }
             case VIEW_TYPE_FORWARD_TO_STORIES_CELL: {
                 TLRPC.Dialog nextDialog = (TLRPC.Dialog) getItem(i + 1);
 
@@ -1390,6 +1405,12 @@ public class DialogsAdapter extends RecyclerListView.SelectionAdapter implements
     private void updateItemList() {
         itemInternals.clear();
         updateHasHints();
+
+        hasForkAdRow = (dialogsType == DialogsActivity.DIALOGS_TYPE_DEFAULT || dialogsType == 7 || dialogsType == 8) && folderId == 0
+                && parentFragment != null && parentFragment.forkShouldShowAdRow();
+        if (hasForkAdRow) {
+            itemInternals.add(new ItemInternal(VIEW_TYPE_FORK_AD));
+        }
 
         MessagesController messagesController = MessagesController.getInstance(currentAccount);
         ArrayList<TLRPC.Dialog> array = parentFragment.getDialogsArray(currentAccount, dialogsType, folderId, dialogsListFrozen);

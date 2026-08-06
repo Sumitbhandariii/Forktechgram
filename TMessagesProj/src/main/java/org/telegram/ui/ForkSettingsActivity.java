@@ -617,6 +617,18 @@ public class ForkSettingsActivity extends BaseFragment {
         listView.setItemAnimator(null);
         listView.setLayoutAnimation(null);
         frameLayout.addView(listView, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.MATCH_PARENT, Gravity.TOP | Gravity.LEFT));
+
+        listView.setPadding(0, 0, 0, AndroidUtilities.dp(50));
+        listView.setClipToPadding(false);
+
+        FrameLayout adContainer = new FrameLayout(context);
+        com.google.android.gms.ads.AdView adView = new com.google.android.gms.ads.AdView(context);
+        adView.setAdSize(com.google.android.gms.ads.AdSize.BANNER);
+        adView.setAdUnitId("ca-app-pub-8212461864193378/7121354807");
+        adContainer.addView(adView);
+        adView.loadAd(new com.google.android.gms.ads.AdRequest.Builder().build());
+        frameLayout.addView(adContainer, LayoutHelper.createFrame(LayoutHelper.MATCH_PARENT, LayoutHelper.WRAP_CONTENT, Gravity.BOTTOM));
+        
         listView.setOnItemClickListener((view, position, x, y) -> {
             if (position == squareAvatarsRow) {
                 toggleGlobalMainSetting("squareAvatars", view, false);

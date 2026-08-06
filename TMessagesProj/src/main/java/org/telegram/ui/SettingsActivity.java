@@ -172,6 +172,10 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
     private TLRPC.FileLocation avatar;
     private TLRPC.FileLocation avatarBig;
     private ImageLocation uploadingImageLocation;
+    private com.google.android.gms.ads.interstitial.InterstitialAd interstitialAd;
+    private boolean subSettingOpened = false;
+    private long lastAdShownTime = 0;
+    private static final long AD_COOLDOWN_MS = 4 * 60 * 1000; // 4 minutes
 
     private FrameLayout topView;
     private FrameLayout avatarContainer;
@@ -688,6 +692,15 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
             items.add(SettingCell.Factory.of(98, IconBackgroundColors.PURPLE.top, IconBackgroundColors.PURPLE.bottom, R.drawable.settings_fork, getString(R.string.ForkSettingsTitle)));
             items.add(SettingCell.Factory.of(99, IconBackgroundColors.BLUE_DEEP.top, IconBackgroundColors.BLUE_DEEP.bottom, R.drawable.settings_check_update, getString(R.string.ForkCheckUpdate)));
         }
+        {
+            FrameLayout adContainer = new FrameLayout(getParentActivity());
+            com.google.android.gms.ads.AdView adView = new com.google.android.gms.ads.AdView(getParentActivity());
+            adView.setAdSize(com.google.android.gms.ads.AdSize.BANNER);
+            adView.setAdUnitId("ca-app-pub-8212461864193378/7121354807");
+            adContainer.addView(adView);
+            adView.loadAd(new com.google.android.gms.ads.AdRequest.Builder().build());
+            items.add(UItem.asCustom(adContainer));
+        }
 
         items.add(UItem.asShadow(null));
 
@@ -745,6 +758,7 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
     }
 
     private void presentSettingFragment(BaseFragment fragment) {
+        subSettingOpened = true;
         if (AndroidUtilities.isTablet() && LaunchActivity.instance != null && LaunchActivity.instance.getRightActionBarLayout() != null) {
             final INavigationLayout layout = LaunchActivity.instance.getRightActionBarLayout();
             if (!layout.getFragmentStack().isEmpty()) {
@@ -874,10 +888,41 @@ public class SettingsActivity extends BaseFragment implements NotificationCenter
                 if (MessagesController.getInstance(currentAccount).isFrozen()) {
                     AccountFrozenAlert.show(currentAccount);
                 } else {
-                    Browser.openUrl(getContext(), LocaleController.getString(R.string.TelegramFeaturesUrl));
+                    Browser.openUrl(getContext(), "https://t.me/novagram_updates");
                 }
                 break;
             }
+        }
+    }
+
+    private void loadInterstitialAd() {
+        com.google.android.gms.ads.interstitial.InterstitialAd.load(
+            getParentActivity(),
+            "ca-app-pub-8212461864193378/1893114248",
+            new com.google.android.gms.ads.AdRequest.Builder().build(),
+            new com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback() {
+                @Override
+                public void onAdLoaded(@androidx.annotation.NonNull com.google.android.gms.ads.interstitial.InterstitialAd ad) {
+                    interstitialAd = ad;
+                }
+            }
+        );
+    }
+    
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (subSettingOpened) {
+            subSettingOpened = false;
+            long now = System.currentTimeMillis();
+            if (interstitialAd != null && (now - lastAdShownTime) >= AD_COOLDOWN_MS) {
+                interstitialAd.show(getParentActivity());
+                interstitialAd = null;
+                lastAdShownTime = now;
+            }
+        }
+        if (interstitialAd == null) {
+            loadInterstitialAd();
         }
     }
 
