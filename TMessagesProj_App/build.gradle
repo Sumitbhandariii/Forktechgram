@@ -50,8 +50,8 @@ def readBuildProp = { String key, Object fallback ->
 }
 
 android {
-    compileSdkVersion 35
-    buildToolsVersion '35.0.0'
+    compileSdkVersion 36
+    buildToolsVersion '36.0.0'
 
     defaultConfig.applicationId = "org.novagram.messenger"
 
@@ -303,7 +303,7 @@ android {
 
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 35
+        targetSdkVersion 36
         versionName Utils['getVersionName']()
         ndkVersion "27.2.12479018"
 
