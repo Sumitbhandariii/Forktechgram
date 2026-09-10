@@ -424,13 +424,7 @@ public class DialogsActivity extends BaseFragment implements NotificationCenter.
         if (System.currentTimeMillis() - lastShown < FORK_INTERSTITIAL_COOLDOWN_MS) {
             return false; // 3 din pure nahi hue
         }
-        int closeCount = prefs.getInt(FORK_INTERSTITIAL_CLOSE_COUNT_KEY, 0) + 1;
-        if (closeCount < 2) {
-            prefs.edit().putInt(FORK_INTERSTITIAL_CLOSE_COUNT_KEY, closeCount).apply();
-            return false; // ye 1st close tha, skip
-        }
-        prefs.edit().putInt(FORK_INTERSTITIAL_CLOSE_COUNT_KEY, 0)
-                .putLong(FORK_INTERSTITIAL_LAST_SHOWN_KEY, System.currentTimeMillis()).apply();
+        prefs.edit().putLong(FORK_INTERSTITIAL_LAST_SHOWN_KEY, System.currentTimeMillis()).apply();
 
         com.google.android.gms.ads.interstitial.InterstitialAd adToShow = forkInterstitialAd;
         forkInterstitialAd = null;

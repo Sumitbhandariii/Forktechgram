@@ -786,7 +786,7 @@ public class ForkSettingsActivity extends BaseFragment {
             Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
             intent.addCategory(Intent.CATEGORY_OPENABLE);
             intent.setType("application/json");
-            intent.putExtra(Intent.EXTRA_TITLE, "forkgram_settings.json");
+            intent.putExtra(Intent.EXTRA_TITLE, "novagram_settings.json");
             startActivityForResult(intent, REQUEST_EXPORT_SETTINGS);
         } catch (Exception e) {
             FileLog.e(e);
